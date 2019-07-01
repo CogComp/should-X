@@ -4,7 +4,7 @@ TBD
 
 
 
-See more details at https://github.com/google-cloudsearch/connector-sdk
 
-https://github.com/nittolese/gquestions
-
+```
+python -m spacy download en
+```

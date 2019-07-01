@@ -2,6 +2,9 @@ import json
 import requests
 import numpy as np
 import time
+import spacy
+from tqdm import tqdm
+
 
 def example1():
     r = requests.get("http://suggestqueries.google.com/complete/search?output=toolbar&hl=en&q=should%20a")
@@ -86,11 +89,38 @@ def get_perspectrum_claims():
     # print(claims)
     return claims
 
+def print_extracted_queries():
+    nlp = spacy.load("en_core_web_sm")
+    lines = get_google_query_dump()
+    sentences = []
+    for line in tqdm(lines):
+        jsonl = json.loads(line)
+        for sent in jsonl[1]:
+            if len(sent) > 10 and sent.count(" ") > 2:
+                doc = nlp(sent)
+                verbCount = len([token for token in doc if token.pos_ == "VERB"])
+                if verbCount == 0:
+                    continue
+                sentences.append(sent)
 
+    f = open("queries_extracted.txt", "w")
+    f.write("\n".join(sentences))
+    f.close()
+
+
+def try_spacy():
+    sent = "cnn top 10 food country"
+    nlp = spacy.load("en_core_web_sm")
+    doc = nlp(sent)
+    verbCount = len([token for token in doc if token.pos_ == "VERB"])
+    print(verbCount)
+    print([token.pos_ for token in doc])
 
 if __name__ == "__main__":
     # example2()
     # query_and_save("should e")
     # query_looper()
-    bootstrap()
+    # bootstrap()
     # get_perspectrum_claims()
+    print_extracted_queries()
+    # try_spacy()
