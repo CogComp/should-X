@@ -52,7 +52,8 @@ def bootstrap():
             # print(jsonl[1])
             # filter out the first few
             for sent in jsonl[1]:
-                sentences.append(sent[0:i])
+                if "should" in sent:
+                    sentences.append(sent[0:i])
 
         for claim in get_perspectrum_claims():
             sentences.append(claim[0:i])
