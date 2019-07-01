@@ -85,6 +85,8 @@ def get_perspectrum_claims():
     # print(claims)
     return claims
 
+
+
 if __name__ == "__main__":
     # example2()
     # query_and_save("should e")
