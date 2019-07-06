@@ -39,10 +39,16 @@ def query_and_save(prefix):
     time.sleep(5)
 
 
+patterns = []
 def query_looper():
     for i in np.arange(ord('a'), 1 + ord('z')):
         # print(chr(i))
-        query_and_save(f"should {chr(i)}")
+        # query_and_save(f"should {chr(i)}")
+        query_and_save(f"why should {chr(i)}")
+        query_and_save(f"reasons why {chr(i)}")
+        query_and_save(f"good reasons why {chr(i)}")
+        query_and_save(f"pros and cons of {chr(i)}")
+
 
 def bootstrap():
     for i in np.arange(9, 40, 1):
@@ -89,6 +95,12 @@ def get_perspectrum_claims():
     # print(claims)
     return claims
 
+def write_claims():
+    claims = get_perspectrum_claims()
+    f = open("perspectrum_claims.txt", "w")
+    f.write("\n".join(claims))
+    f.close()
+
 def print_extracted_queries():
     nlp = spacy.load("en_core_web_sm")
     lines = get_google_query_dump()
@@ -119,8 +131,9 @@ def try_spacy():
 if __name__ == "__main__":
     # example2()
     # query_and_save("should e")
-    # query_looper()
+    query_looper()
     # bootstrap()
     # get_perspectrum_claims()
-    print_extracted_queries()
+    # print_extracted_queries()
     # try_spacy()
+    # write_claims()
