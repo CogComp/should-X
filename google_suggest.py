@@ -51,7 +51,7 @@ def query_looper():
 
 
 def bootstrap():
-    for i in np.arange(9, 40, 2):
+    for i in np.arange(12, 40, 2):
         print(f" ============== \n * i: {i}")
         # read the list of queries
         lines = get_google_query_dump()
