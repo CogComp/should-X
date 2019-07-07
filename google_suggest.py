@@ -51,7 +51,7 @@ def query_looper():
 
 
 def bootstrap():
-    for i in np.arange(9, 40, 1):
+    for i in np.arange(9, 40, 2):
         print(f" ============== \n * i: {i}")
         # read the list of queries
         lines = get_google_query_dump()
@@ -131,8 +131,8 @@ def try_spacy():
 if __name__ == "__main__":
     # example2()
     # query_and_save("should e")
-    query_looper()
-    # bootstrap()
+    # query_looper()
+    bootstrap()
     # get_perspectrum_claims()
     # print_extracted_queries()
     # try_spacy()
