@@ -108,7 +108,7 @@ def print_extracted_queries():
     for line in tqdm(lines):
         jsonl = json.loads(line)
         for sent in jsonl[1]:
-            if len(sent) > 10 and sent.count(" ") > 2:
+            if len(sent) > 10 and sent.count(" ") > 3 and sent not in sentences:
                 doc = nlp(sent)
                 verbCount = len([token for token in doc if token.pos_ == "VERB"])
                 if verbCount == 0:
@@ -116,13 +116,15 @@ def print_extracted_queries():
                 sentences.append(sent)
 
     f = open("queries_extracted.txt", "w")
+    sentences = list(set(sentences))
+    sentences = sorted(sentences)
     f.write("\n".join(sentences))
     f.close()
 
 
 def try_spacy():
-    sent = "cnn top 10 food country"
-    nlp = spacy.load("en_core_web_sm")
+    sent = "shoulder pain icd 10"
+    nlp = spacy.load("en_core_web_md")
     doc = nlp(sent)
     verbCount = len([token for token in doc if token.pos_ == "VERB"])
     print(verbCount)
@@ -132,8 +134,8 @@ if __name__ == "__main__":
     # example2()
     # query_and_save("should e")
     # query_looper()
-    bootstrap()
+    # bootstrap()
     # get_perspectrum_claims()
-    # print_extracted_queries()
+    print_extracted_queries()
     # try_spacy()
     # write_claims()
