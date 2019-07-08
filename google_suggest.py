@@ -44,10 +44,15 @@ def query_looper():
     for i in np.arange(ord('a'), 1 + ord('z')):
         # print(chr(i))
         # query_and_save(f"should {chr(i)}")
-        query_and_save(f"why should {chr(i)}")
-        query_and_save(f"reasons why {chr(i)}")
+        # query_and_save(f"why should {chr(i)}")
+        # query_and_save(f"reasons why {chr(i)}")
+        # query_and_save(f"good reasons why {chr(i)}")
+        # query_and_save(f"pros and cons of {chr(i)}")
+        query_and_save(f"reasons on why {chr(i)}")
         query_and_save(f"good reasons why {chr(i)}")
-        query_and_save(f"pros and cons of {chr(i)}")
+        query_and_save(f"facts about why {chr(i)}")
+        query_and_save(f"arguments why {chr(i)}")
+        query_and_save(f"arguments on why {chr(i)}")
 
 
 def bootstrap():
@@ -102,7 +107,7 @@ def write_claims():
     f.close()
 
 def print_extracted_queries():
-    nlp = spacy.load("en_core_web_sm")
+    nlp = spacy.load("en_core_web_md")
     lines = get_google_query_dump()
     sentences = []
     for line in tqdm(lines):
@@ -133,9 +138,9 @@ def try_spacy():
 if __name__ == "__main__":
     # example2()
     # query_and_save("should e")
-    # query_looper()
+    query_looper()
     # bootstrap()
     # get_perspectrum_claims()
-    print_extracted_queries()
+    # print_extracted_queries()
     # try_spacy()
     # write_claims()
