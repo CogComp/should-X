@@ -138,8 +138,8 @@ def try_spacy():
 if __name__ == "__main__":
     # example2()
     # query_and_save("should e")
-    query_looper()
-    # bootstrap()
+    # query_looper()
+    bootstrap()
     # get_perspectrum_claims()
     # print_extracted_queries()
     # try_spacy()
