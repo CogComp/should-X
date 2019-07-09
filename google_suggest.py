@@ -83,6 +83,11 @@ def get_google_query_dump():
         lines = f.readlines()
     return lines
 
+def get_all_extracted_queries():
+    with open("queries_extracted.txt", "r") as f:
+        lines = f.readlines()
+    return lines
+
 def get_queries_issued_to_google():
     lines = get_google_query_dump()
     queries = []
@@ -113,7 +118,7 @@ def print_extracted_queries():
     for line in tqdm(lines):
         jsonl = json.loads(line)
         for sent in jsonl[1]:
-            if len(sent) > 10 and sent.count(" ") > 3 and sent not in sentences:
+            if len(sent) > 15 and sent.count(" ") > 3 and sent not in sentences:
                 doc = nlp(sent)
                 verbCount = len([token for token in doc if token.pos_ == "VERB"])
                 if verbCount == 0:
@@ -135,12 +140,51 @@ def try_spacy():
     print(verbCount)
     print([token.pos_ for token in doc])
 
+def count_queries_per_category():
+    query_patterns = [
+        "should ",
+        "shouldn't ",
+        "should not ",
+        "why should ",
+        "why shouldn't ",
+        "why should not ",
+        "reasons why ",
+        "good reasons why ",
+        "pros and cons of ",
+        " facts why ",
+        "reasons on why ",
+        "reasons for ",
+        "reasons to ",
+        "good reasons why ",
+        "facts about why ",
+        "arguments why ",
+        "arguments on why ",
+    ]
+
+    # read all the queries from disk:
+    extracted = get_all_extracted_queries()
+
+    union = []
+    for query_pattern in query_patterns:
+        selected = [q for q in extracted if query_pattern in q]
+        f = open("query_category/" + query_pattern.replace(" ", "_") + ".txt", "w")
+        f.write("\n".join(selected))
+        f.close()
+        print(f" * number of queries in the category `{query_pattern}` is {len(selected)}")
+        for q in selected:
+            if q not in union:
+                union.append(q)
+    f = open("query_category/union.txt", "w")
+    f.write("\n".join(union))
+    f.close()
+
 if __name__ == "__main__":
     # example2()
     # query_and_save("should e")
     # query_looper()
-    bootstrap()
+    # bootstrap()
     # get_perspectrum_claims()
     # print_extracted_queries()
     # try_spacy()
     # write_claims()
+    count_queries_per_category()
