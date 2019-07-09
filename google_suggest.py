@@ -142,6 +142,9 @@ def try_spacy():
 
 def count_queries_per_category():
     query_patterns = [
+        "reasons on why ",
+        "reasons for ",
+        "reasons to ",
         "should ",
         "shouldn't ",
         "should not ",
@@ -151,10 +154,7 @@ def count_queries_per_category():
         "reasons why ",
         "good reasons why ",
         "pros and cons of ",
-        " facts why ",
-        "reasons on why ",
-        "reasons for ",
-        "reasons to ",
+        "facts why ",
         "good reasons why ",
         "facts about why ",
         "arguments why ",
@@ -167,15 +167,23 @@ def count_queries_per_category():
     union = []
     for query_pattern in query_patterns:
         selected = [q for q in extracted if query_pattern in q]
-        f = open("query_category/" + query_pattern.replace(" ", "_") + ".txt", "w")
-        f.write("\n".join(selected))
+        f = open("query_category/contains_" + query_pattern.replace(" ", "_") + ".txt", "w")
+        f.write("".join(selected))
         f.close()
-        print(f" * number of queries in the category `{query_pattern}` is {len(selected)}")
-        for q in selected:
-            if q not in union:
-                union.append(q)
+        print(f" * number of queries that contain `{query_pattern}` is {len(selected)}")
+
+        selected_starts = [q for q in selected if q.startswith(query_pattern)]
+        f = open("query_category/starts_" + query_pattern.replace(" ", "_") + ".txt", "w")
+        f.write("".join(selected_starts))
+        f.close()
+        print(f" * number of queries that start with `{query_pattern}` is {len(selected_starts)}")
+
+        union.extend(selected)
+
+    union = list(set(union))
+    union = sorted(union)
     f = open("query_category/union.txt", "w")
-    f.write("\n".join(union))
+    f.write("".join(union))
     f.close()
 
 if __name__ == "__main__":
