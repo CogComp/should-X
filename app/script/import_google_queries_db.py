@@ -15,7 +15,7 @@ def import_queries(file, comment=""):
         for line in fin:
             line = line.strip()
             if validate_query(line):
-                GoogleQuery.objects.create(text=line, comment="")
+                GoogleQuery.objects.create(text=line, comment=comment)
 
 
 def make_batches(batch_size, clear_previous_batch=True):
@@ -36,6 +36,12 @@ def _chunks(l, n):
     """
     for i in range(0, len(l), n):
         yield l[i:i + n]
+
+def import_chris_annotations(file, comment="")
+    with open(file) as fin:
+        for line in fin:
+            line = line.strip()
+            parts = line.split('\t')
 
 
 if __name__ == '__main__':

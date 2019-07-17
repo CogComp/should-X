@@ -19,5 +19,5 @@ from app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('claim_verification/', )
+    path('claim_verification/', views.render_claim_verification)
 ]
