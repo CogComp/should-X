@@ -166,6 +166,7 @@ class AbstractBatch(models.Model):
 #############################
 class GoogleQuery(models.Model):
     text = models.TextField()
+    comment = models.TextField()
 
 
 class GoogleQueryAnnotation(models.Model):
