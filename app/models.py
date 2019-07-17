@@ -171,9 +171,11 @@ class GoogleQuery(models.Model):
 
 class GoogleQueryAnnotation(models.Model):
     author = models.TextField()
-    debate_worthy = models.BinaryField()
-    topic_label = models.CharField(max_length=50)
-    annotation_time = models.DateTimeField()
+    query_id = models.IntegerField(default=-1)
+    debate_worthy = models.BooleanField()
+    topic_label = models.CharField(max_length=100)
+    annotation_time = models.DateTimeField(null=True)
+    comment = models.TextField(default="")
 
 
 class GoogleQueryBatch(AbstractBatch):
