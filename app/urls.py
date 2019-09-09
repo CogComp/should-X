@@ -16,8 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from app import views
+from app import auth
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('claim_verification/', views.render_claim_verification)
+
+    # Google Query Annotation interface
+    path('claim_verification/', views.render_claim_verification),
+    path('claim_verification_task_list', views.render_claim_task_list),
+
+    # APIs
+    path('auth/login/', auth.auth_login),
 ]

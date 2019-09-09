@@ -35,12 +35,12 @@ class AbstractAnnotationSession(models.Model):
         if unfinished_sessions.count() > 0:
             session = unfinished_sessions[0]
         else:
-            claim_ids = cls.generate_jobs(username, 1)
+            claim_ids = cls._generate_jobs(username, 1)
             time_now = datetime.datetime.now(datetime.timezone.utc)
             session = cls.objects.create(username=username,
                                          jobs=json.dumps(claim_ids),
                                          finished_jobs=json.dumps([]),
-                                         instruction_complete=cls.instr_needed(username),
+                                         instruction_complete=cls._instr_needed(username),
                                          duration=datetime.timedelta(),
                                          last_start_time=time_now)
 
@@ -62,7 +62,7 @@ class AbstractAnnotationSession(models.Model):
                 s.delete()
 
     @classmethod
-    def instr_needed(cls, username):
+    def _instr_needed(cls, username):
         """
         Check if a user need to take instruction
         :param username:
@@ -72,7 +72,7 @@ class AbstractAnnotationSession(models.Model):
         return count > 0
 
     @classmethod
-    def generate_jobs(cls, username, num_jobs, max_assign_count=3):
+    def _generate_jobs(cls, username, num_jobs, max_assign_count=3):
         """
         When each worker first login, generate the set of jobs they will be doing
         :param username:
@@ -82,7 +82,7 @@ class AbstractAnnotationSession(models.Model):
         """
         cls.clean_idle_sessions()
 
-        finished = cls.get_all_finished_batches(username)
+        finished = cls._get_all_finished_batches(username)
 
         eb_id_set = cls.get_batch_class().objects.filter(assign_counts__lt=max_assign_count).exclude(id__in=finished)
 
@@ -112,12 +112,12 @@ class AbstractAnnotationSession(models.Model):
                 jobs = np.random.choice([t.id for t in assign_counts], size=num_jobs, replace=False).tolist()
 
         if username != "TEST":
-            cls.get_batch_class().increment_assign_counts()
+            cls.get_batch_class().increment_assign_counts(jobs)
 
         return jobs
 
     @classmethod
-    def get_all_finished_batches(cls, username):
+    def _get_all_finished_batches(cls, username):
         _jobs = cls.objects.filter(username=username).values_list("jobs", flat=True)
         jobs = []
         for j in _jobs:
