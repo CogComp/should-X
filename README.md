@@ -3,8 +3,8 @@
 
 Sources of candidate claims:
 
- (1) Google Suggest API
- (2) Google's `People Also Ask` boxes: extracted using GQuestions package ([forked version](https://github.com/danyaljj/gquestions))
+ 1. Google Suggest API
+ 2. Google's `People Also Ask` boxes: extracted using GQuestions package ([forked version](https://github.com/danyaljj/gquestions))
  
  
 
