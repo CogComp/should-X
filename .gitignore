@@ -112,3 +112,6 @@ ENV/
 ACLWeb-9c493c1ba836.json
 env3.6/
 should-x.iml
+
+# sqlite database
+*.sqlite3
