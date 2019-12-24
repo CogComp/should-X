@@ -38,6 +38,16 @@ def query_and_save(prefix):
         f.close()
     time.sleep(5)
 
+def query_and_return(prefix):
+    time.sleep(3)
+    r = requests.get(f"http://google.com/complete/search?client=chrome&q={prefix}")
+    if r.status_code == 200:
+        # save it
+        content = r.content.decode("utf-8", errors='replace')
+        content = json.loads(content)
+        return content[1]
+    else:
+        return []
 
 patterns = []
 def query_looper():
@@ -186,6 +196,79 @@ def count_queries_per_category():
     f.write("".join(union))
     f.close()
 
+def crawl_questions():
+    query_patterns = [
+        "who ",
+        "whom ",
+        "whose ",
+        "what ",
+        "which ",
+        "when ",
+        "where ",
+        "why ",
+        "how ",
+        "should ",
+        "would ",
+        "wouldn’t ",
+        "can ",
+        "can’t ",
+        "will ",
+        "won’t ",
+        "are ",
+        "aren’t ",
+        "do ",
+        "does ",
+        "has ",
+        "have ",
+        "is ",
+        "shouldn’t ",
+        "isn't ",
+        "could ",
+        "couldn’t ",
+        "does ",
+        "don’t ",
+        "must ",
+        "may ",
+        "ought ",
+    ]
+
+    all_results = []
+
+    # first step using the queries only
+    for pattern in query_patterns:
+        output = query_and_return(pattern)
+        for out in output:
+            if len(out) < 15:
+                continue
+            if out not in all_results:
+                all_results.append(out)
+        print(len(all_results))
+        print(all_results[-1])
+    all_results = list(set(all_results))
+
+    # then, augment the results
+    for idx in range(4, 10):
+        for result in all_results:
+            prefix = result[:idx]
+            if prefix not in query_patterns:
+                continue
+            for i in np.arange(ord('a'), 1 + ord('z')):
+                prefix1 = prefix + chr(i)
+                print(f" ** {prefix1}")
+                output = query_and_return(prefix1)
+                # all_results.extend(output)
+                for out in output:
+                    if len(out) < 15:
+                        continue
+                    if out not in all_results:
+                        all_results.append(out)
+                print(len(all_results))
+                print(all_results[-1])
+            all_results = list(set(all_results))
+            f = open("questions.txt", "w")
+            f.write("\n".join(all_results))
+            f.close()
+
 if __name__ == "__main__":
     # example2()
     # query_and_save("should e")
@@ -195,4 +278,5 @@ if __name__ == "__main__":
     # print_extracted_queries()
     # try_spacy()
     # write_claims()
-    count_queries_per_category()
+    # count_queries_per_category()
+    crawl_questions()
