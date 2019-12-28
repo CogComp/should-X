@@ -39,7 +39,7 @@ def query_and_save(prefix):
     time.sleep(5)
 
 def query_and_return(prefix):
-    time.sleep(3)
+    time.sleep(2)
     r = requests.get(f"http://google.com/complete/search?client=chrome&q={prefix}")
     if r.status_code == 200:
         # save it
@@ -247,7 +247,7 @@ def crawl_questions():
     all_results = list(set(all_results))
 
     # then, augment the results
-    for idx in range(4, 10):
+    for idx in tqdm(range(4, 50)):
         for result in all_results:
             prefix = result[:idx]
             if prefix not in query_patterns:
@@ -259,12 +259,17 @@ def crawl_questions():
                 # all_results.extend(output)
                 for out in output:
                     if len(out) < 15:
+                        print(f" ----> {out}: X")
                         continue
                     if out not in all_results:
                         all_results.append(out)
+                        print(f" ----> {out}: Y")
+                    else:
+                        print(f" ----> {out}: X2")
                 print(len(all_results))
                 print(all_results[-1])
             all_results = list(set(all_results))
+            all_results = sorted(all_results)
             f = open("questions.txt", "w")
             f.write("\n".join(all_results))
             f.close()
