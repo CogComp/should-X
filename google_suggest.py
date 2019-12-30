@@ -247,11 +247,14 @@ def crawl_questions():
     all_results = list(set(all_results))
 
     # then, augment the results
-    for idx in tqdm(range(4, 50)):
+    for idx in tqdm(range(0, 30)):
         for result in all_results:
-            prefix = result[:idx]
-            if prefix not in query_patterns:
+            prefix = result[:4 + idx*1]
+            matching_patterns = [q for q in query_patterns if q in prefix]
+            if len(matching_patterns) <= 0:
                 continue
+            # if prefix not in query_patterns:
+            #     continue
             for i in np.arange(ord('a'), 1 + ord('z')):
                 prefix1 = prefix + chr(i)
                 print(f" ** {prefix1}")
