@@ -247,6 +247,7 @@ def crawl_questions():
     all_results = list(set(all_results))
 
     # then, augment the results
+    past_queries = []
     for idx in tqdm(range(0, 30)):
         for result in all_results:
             prefix = result[:4 + idx*1]
@@ -255,6 +256,11 @@ def crawl_questions():
                 continue
             # if prefix not in query_patterns:
             #     continue
+            if prefix in past_queries:
+                continue
+            else:
+                past_queries.append(prefix)
+
             for i in np.arange(ord('a'), 1 + ord('z')):
                 prefix1 = prefix + chr(i)
                 print(f" ** {prefix1}")
@@ -273,7 +279,7 @@ def crawl_questions():
                 print(all_results[-1])
             all_results = list(set(all_results))
             all_results = sorted(all_results)
-            f = open("questions.txt", "w")
+            f = open("questions_faster.txt", "w")
             f.write("\n".join(all_results))
             f.close()
 
