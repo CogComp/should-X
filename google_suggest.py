@@ -196,42 +196,42 @@ def count_queries_per_category():
     f.write("".join(union))
     f.close()
 
-def crawl_questions():
-    query_patterns = [
-        "who ",
-        "whom ",
-        "whose ",
-        "what ",
-        "which ",
-        "when ",
-        "where ",
-        "why ",
-        "how ",
-        "should ",
-        "would ",
-        "wouldn’t ",
-        "can ",
-        "can’t ",
-        "will ",
-        "won’t ",
-        "are ",
-        "aren’t ",
-        "do ",
-        "does ",
-        "has ",
-        "have ",
-        "is ",
-        "shouldn’t ",
-        "isn't ",
-        "could ",
-        "couldn’t ",
-        "does ",
-        "don’t ",
-        "must ",
-        "may ",
-        "ought ",
-    ]
+query_patterns = [
+    "who ",
+    "whom ",
+    "whose ",
+    "what ",
+    "which ",
+    "when ",
+    "where ",
+    "why ",
+    "how ",
+    "should ",
+    "would ",
+    "wouldn’t ",
+    "can ",
+    "can’t ",
+    "will ",
+    "won’t ",
+    "are ",
+    "aren’t ",
+    "do ",
+    "does ",
+    "has ",
+    "have ",
+    "is ",
+    "shouldn’t ",
+    "isn't ",
+    "could ",
+    "couldn’t ",
+    "does ",
+    "don’t ",
+    "must ",
+    "may ",
+    "ought ",
+]
 
+def crawl_questions():
     all_results = []
 
     # first step using the queries only
@@ -283,6 +283,63 @@ def crawl_questions():
             f.write("\n".join(all_results))
             f.close()
 
+def crawl_questions_continue():
+
+    # then, augment the results
+    all_results = []
+    with open("questions_faster.txt") as f:
+        for l in f.readlines():
+            all_results.append(l.replace("\n", ""))
+
+    past_queries = []
+    for idx in tqdm(range(0, 30)):
+        for result in all_results:
+            prefix = result[:10 + idx*2]
+            matching_patterns = [q for q in query_patterns if q in prefix]
+            if len(matching_patterns) <= 0:
+                continue
+            # if prefix not in query_patterns:
+            #     continue
+            if prefix in past_queries:
+                continue
+            else:
+                past_queries.append(prefix)
+
+            for i in np.arange(ord('a'), 1 + ord('z')):
+                prefix1 = prefix + chr(i)
+                print(f" ** {prefix1}")
+                output = query_and_return(prefix1)
+                # all_results.extend(output)
+                for out in output:
+                    if len(out) < 15:
+                        print(f" ----> {out}: X")
+                        continue
+                    if out not in all_results:
+                        all_results.append(out)
+                        print(f" ----> {out}: Y")
+                    else:
+                        print(f" ----> {out}: X2")
+                print(len(all_results))
+                print(all_results[-1])
+            all_results = list(set(all_results))
+            all_results = sorted(all_results)
+            f = open("questions_faster2.txt", "w")
+            f.write("\n".join(all_results))
+            f.close()
+
+
+def clean_up_questions():
+    clean_results = []
+    with open("questions_faster.txt") as f:
+        for l in f.readlines():
+            matching_patterns = [q for q in query_patterns if q in l]
+            if len(matching_patterns) > 0:
+                clean_results.append(l)
+    f = open("questions_faster_clean.txt", "w")
+    f.write("".join(clean_results))
+    f.close()
+
+
 if __name__ == "__main__":
     # example2()
     # query_and_save("should e")
@@ -293,4 +350,6 @@ if __name__ == "__main__":
     # try_spacy()
     # write_claims()
     # count_queries_per_category()
-    crawl_questions()
+    # crawl_questions()
+    crawl_questions_continue()
+    # clean_up_questions()
