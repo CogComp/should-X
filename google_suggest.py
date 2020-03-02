@@ -213,12 +213,13 @@ query_patterns = [
     "can’t ",
     "will ",
     "won’t ",
-    "are ",
     "aren’t ",
     "do ",
     "does ",
     "has ",
     "have ",
+    "am ",
+    "are ",
     "is ",
     "shouldn’t ",
     "isn't ",
@@ -287,14 +288,14 @@ def crawl_questions_continue():
 
     # then, augment the results
     all_results = []
-    with open("questions_faster.txt") as f:
+    with open("questions_faster3.txt") as f:
         for l in f.readlines():
             all_results.append(l.replace("\n", ""))
 
     past_queries = []
     for idx in tqdm(range(0, 30)):
         for result in all_results:
-            prefix = result[:10 + idx*2]
+            prefix = result[:12 + idx*2]
             matching_patterns = [q for q in query_patterns if q in prefix]
             if len(matching_patterns) <= 0:
                 continue
@@ -323,19 +324,23 @@ def crawl_questions_continue():
                 print(all_results[-1])
             all_results = list(set(all_results))
             all_results = sorted(all_results)
-            f = open("questions_faster2.txt", "w")
+            f = open("questions_faster3.txt", "w")
             f.write("\n".join(all_results))
             f.close()
 
 
 def clean_up_questions():
     clean_results = []
-    with open("questions_faster.txt") as f:
+    str1 = "\n"
+    with open("questions_faster2.txt") as f:
         for l in f.readlines():
             matching_patterns = [q for q in query_patterns if q in l]
+
             if len(matching_patterns) > 0:
                 clean_results.append(l)
-    f = open("questions_faster_clean.txt", "w")
+            else:
+                print(f">>>> skipping: {l.replace(str1, '')}")
+    f = open("questions_faster2_clean.txt", "w")
     f.write("".join(clean_results))
     f.close()
 
