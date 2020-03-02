@@ -39,7 +39,7 @@ def query_and_save(prefix):
     time.sleep(5)
 
 def query_and_return(prefix):
-    time.sleep(2)
+    time.sleep(0.8)
     r = requests.get(f"http://google.com/complete/search?client=chrome&q={prefix}")
     if r.status_code == 200:
         # save it
