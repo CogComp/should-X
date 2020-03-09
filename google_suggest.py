@@ -326,7 +326,7 @@ def crawl_questions_continue():
                     else:
                         print(f" ----> {out}: X2")
                 print(len(all_results))
-                print(all_results[-1])
+                # print(all_results[-1])
             all_results = list(set(all_results))
             all_results = sorted(all_results)
             f = open("questions_faster3.txt", "w")
