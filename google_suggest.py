@@ -197,39 +197,39 @@ def count_queries_per_category():
     f.close()
 
 query_patterns = [
-    "who ",
-    "whom ",
-    "whose ",
-    "what ",
-    "which ",
-    "when ",
-    "where ",
-    "why ",
-    "how ",
-    "should ",
-    "would ",
-    "wouldn’t ",
-    "can ",
-    "can’t ",
-    "will ",
-    "won’t ",
-    "aren’t ",
-    "do ",
-    "does ",
-    "has ",
-    "have ",
-    "am ",
-    "are ",
-    "is ",
-    "shouldn’t ",
-    "isn't ",
-    "could ",
-    "couldn’t ",
-    "does ",
-    "don’t ",
-    "must ",
-    "may ",
-    "ought ",
+    " who ",
+    " whom ",
+    " whose ",
+    " what ",
+    " which ",
+    " when ",
+    " where ",
+    " why ",
+    " how ",
+    " should ",
+    " would ",
+    " wouldn’t ",
+    " can ",
+    " can’t ",
+    " will ",
+    " won’t ",
+    " aren’t ",
+    " do ",
+    " does ",
+    " has ",
+    " have ",
+    " am ",
+    " are ",
+    " is ",
+    " shouldn’t ",
+    " isn't ",
+    " could ",
+    " couldn’t ",
+    " does ",
+    " don’t ",
+    " must ",
+    " may ",
+    " ought ",
 ]
 
 def crawl_questions():
@@ -252,7 +252,7 @@ def crawl_questions():
     for idx in tqdm(range(0, 30)):
         for result in all_results:
             prefix = result[:4 + idx*1]
-            matching_patterns = [q for q in query_patterns if q in prefix]
+            matching_patterns = [q for q in query_patterns if q in f" {prefix} "]
             if len(matching_patterns) <= 0:
                 continue
             # if prefix not in query_patterns:
@@ -296,18 +296,14 @@ def crawl_questions_continue():
     for idx in tqdm(range(0, 30)):
         for result in all_results:
 
-            matching_patterns = [q for q in query_patterns if q in result]
-
+            # if prefix not in query_patterns:
+            #     continue
+            matching_patterns = [q for q in query_patterns if q in f" {result} "]
             if len(matching_patterns) == 0:
                 print(f">>>> skipping: {l}")
                 continue
 
             prefix = result[:15 + idx*2]
-            matching_patterns = [q for q in query_patterns if q in prefix]
-            if len(matching_patterns) <= 0:
-                continue
-            # if prefix not in query_patterns:
-            #     continue
             if prefix in past_queries:
                 continue
             else:
@@ -341,7 +337,7 @@ def clean_up_questions():
     str1 = "\n"
     with open("questions_faster2.txt") as f:
         for l in f.readlines():
-            matching_patterns = [q for q in query_patterns if q in l]
+            matching_patterns = [q for q in query_patterns if q in f" {l} "]
 
             if len(matching_patterns) > 0:
                 clean_results.append(l)
