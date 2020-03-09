@@ -295,6 +295,13 @@ def crawl_questions_continue():
     past_queries = []
     for idx in tqdm(range(0, 30)):
         for result in all_results:
+
+            matching_patterns = [q for q in query_patterns if q in result]
+
+            if len(matching_patterns) == 0:
+                print(f">>>> skipping: {l}")
+                continue
+
             prefix = result[:12 + idx*2]
             matching_patterns = [q for q in query_patterns if q in prefix]
             if len(matching_patterns) <= 0:
