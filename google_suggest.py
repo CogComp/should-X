@@ -296,16 +296,17 @@ def crawl_questions_continue():
     for idx in tqdm(range(0, 30)):
         for result in all_results:
 
+            prefix = result[:15 + idx*2]
+
             # if prefix not in query_patterns:
             #     continue
-            matching_patterns = [q for q in query_patterns if q in f" {result} "]
+            matching_patterns = [q for q in query_patterns if q in f" {prefix} "]
             if len(matching_patterns) == 0:
                 print(f">>>> skipping: {l}")
                 continue
             else:
                 print(f"matching_patterns: {matching_patterns}")
 
-            prefix = result[:15 + idx*2]
             if prefix in past_queries:
                 continue
             else:
