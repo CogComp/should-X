@@ -302,7 +302,7 @@ def crawl_questions_continue():
                 print(f">>>> skipping: {l}")
                 continue
 
-            prefix = result[:12 + idx*2]
+            prefix = result[:15 + idx*2]
             matching_patterns = [q for q in query_patterns if q in prefix]
             if len(matching_patterns) <= 0:
                 continue
