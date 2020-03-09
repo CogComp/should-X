@@ -302,6 +302,8 @@ def crawl_questions_continue():
             if len(matching_patterns) == 0:
                 print(f">>>> skipping: {l}")
                 continue
+            else:
+                print(f"matching_patterns: {matching_patterns}")
 
             prefix = result[:15 + idx*2]
             if prefix in past_queries:
