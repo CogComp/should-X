@@ -284,6 +284,12 @@ def crawl_questions():
             f.write("\n".join(all_results))
             f.close()
 
+import re
+number_may_space = re.compile(r'\d may ')
+number_may_end = re.compile(r'\d may$')
+space_may_numbers = re.compile(r' may \d\d')
+begin_may_numbers = re.compile(r'^may \d\d')
+
 def crawl_questions_continue():
 
     # then, augment the results
@@ -296,7 +302,7 @@ def crawl_questions_continue():
     for idx in tqdm(range(0, 30)):
         for result in all_results:
 
-            prefix = result[:15 + idx*2]
+            prefix = result[:16 + idx*2]
 
             # if prefix not in query_patterns:
             #     continue
@@ -306,6 +312,23 @@ def crawl_questions_continue():
                 continue
             else:
                 print(f"matching_patterns: {matching_patterns}")
+
+            # skip is it is of the form `d may`, `may dd`, etc.
+            if number_may_space.search(result) is not None:
+                print(f" ** skipping because it matches the patten: {number_may_space}")
+                continue
+
+            if number_may_end.search(result) is not None:
+                print(f" ** skipping because it matches the patten: {number_may_end}")
+                continue
+
+            if begin_may_numbers.search(result) is not None:
+                print(f" ** skipping because it matches the patten: {begin_may_numbers}")
+                continue
+
+            if space_may_numbers.search(result) is not None:
+                print(f" ** skipping because it matches the patten: {space_may_numbers}")
+                continue
 
             if prefix in past_queries:
                 continue
