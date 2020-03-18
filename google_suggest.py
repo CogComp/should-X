@@ -306,12 +306,12 @@ def crawl_questions_continue():
         for result in all_results:
             idx_cut = 17 + idx*2
 
-            if " " not in result:
-                print(" ** skipping because no space was found . . .")
-                continue
-
             # find the index of the next space
-            idx_cut = result.index(" ", idx_cut)
+            try:
+                idx_cut = result.index(" ", idx_cut)
+            except:
+                print(f" ** skipping `{result}` because no space was found after index {idx_cut} . . .")
+                continue
 
             if len(result) < idx_cut - 1:
                 print(" ** skipping because it's too short")
