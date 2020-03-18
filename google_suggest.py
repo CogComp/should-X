@@ -304,17 +304,11 @@ def crawl_questions_continue():
     for idx in tqdm(range(0, 30)):
         random.shuffle(all_results)
         for result in all_results:
+            idx_cut = 17 + idx*2
 
-            prefix = result[:17 + idx*2]
-
-            # if prefix not in query_patterns:
-            #     continue
-            matching_patterns = [q for q in query_patterns if q in f" {prefix} "]
-            if len(matching_patterns) == 0:
-                print(f">>>> skipping: {l}")
+            if len(result) < idx_cut - 1:
+                print(" ** skipping because it's too short")
                 continue
-            else:
-                print(f"matching_patterns: {matching_patterns}")
 
             # skip is it is of the form `d may`, `may dd`, etc.
             if number_may_space.search(result) is not None:
@@ -332,6 +326,18 @@ def crawl_questions_continue():
             if space_may_numbers.search(result) is not None:
                 print(f" ** skipping because it matches the patten: {space_may_numbers}")
                 continue
+
+
+            prefix = result[:idx_cut]
+
+            # if prefix not in query_patterns:
+            #     continue
+            matching_patterns = [q for q in query_patterns if q in f" {prefix} "]
+            if len(matching_patterns) == 0:
+                print(f">>>> skipping: {l}")
+                continue
+            else:
+                print(f"matching_patterns: {matching_patterns}")
 
             if prefix in past_queries:
                 continue
