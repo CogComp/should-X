@@ -306,6 +306,13 @@ def crawl_questions_continue():
         for result in all_results:
             idx_cut = 17 + idx*2
 
+            if " " not in result:
+                print(" ** skipping because no space was found . . .")
+                continue
+
+            # find the index of the next space
+            idx_cut = result.index(" ", idx_cut)
+
             if len(result) < idx_cut - 1:
                 print(" ** skipping because it's too short")
                 continue
@@ -328,7 +335,7 @@ def crawl_questions_continue():
                 continue
 
 
-            prefix = result[:idx_cut]
+            prefix = result[:idx_cut + 1]
 
             # if prefix not in query_patterns:
             #     continue
