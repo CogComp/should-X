@@ -1,4 +1,6 @@
 import json
+import random
+
 import requests
 import numpy as np
 import time
@@ -300,9 +302,10 @@ def crawl_questions_continue():
 
     past_queries = []
     for idx in tqdm(range(0, 30)):
+        random.shuffle(all_results)
         for result in all_results:
 
-            prefix = result[:16 + idx*2]
+            prefix = result[:17 + idx*2]
 
             # if prefix not in query_patterns:
             #     continue
