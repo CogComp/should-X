@@ -304,7 +304,7 @@ def crawl_questions_continue():
     for idx in tqdm(range(0, 30)):
         random.shuffle(all_results)
         for result in all_results:
-            idx_cut = 40 + idx*2
+            idx_cut = 35 + idx*2
 
             # find the index of the next space
             try:
