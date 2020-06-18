@@ -41,7 +41,7 @@ def query_and_save(prefix):
     time.sleep(5)
 
 def query_and_return(prefix):
-    time.sleep(0.8)
+    time.sleep(0.3)
     r = requests.get(f"http://google.com/complete/search?client=chrome&q={prefix}")
     if r.status_code == 200:
         # save it
@@ -304,7 +304,7 @@ def crawl_questions_continue():
     for idx in tqdm(range(0, 30)):
         random.shuffle(all_results)
         for result in all_results:
-            idx_cut = 17 + idx*2
+            idx_cut = 35 + idx*2
 
             # find the index of the next space
             try:
