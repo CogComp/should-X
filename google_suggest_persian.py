@@ -54,6 +54,9 @@ query_patterns = [
 ]
 
 
+persian_alphabet = ['آ', 'ا', 'ب', 'پ', 'ت', 'ث', 'ج', 'چ', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'ژ', 'س', 'ش', 'ص', 'ض',
+                    'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ک', 'گ', 'ل', 'م', 'ن', 'و', 'ه', 'ی']
+
 def crawl_questions_continue():
 
     # then, augment the results
@@ -65,8 +68,8 @@ def crawl_questions_continue():
     past_queries = []
     for idx in tqdm(range(0, 30)):
         random.shuffle(all_results)
-        for result in all_results:
-            idx_cut = 10 + idx*2
+        for result in all_results[:500]:
+            idx_cut = 7 + idx*2
 
             # find the index of the next space
             try:
@@ -95,8 +98,8 @@ def crawl_questions_continue():
             else:
                 past_queries.append(prefix)
 
-            for i in np.arange(ord('a'), 1 + ord('z')):
-                prefix1 = prefix + chr(i)
+            for character in persian_alphabet:
+                prefix1 = prefix + character
                 print(f" ** {prefix1}")
                 output = query_and_return(prefix1)
                 # all_results.extend(output)
