@@ -37,7 +37,6 @@ def ask_google(query):
 def crawl(i, question):
     html = ask_google(question)
     cur.execute('UPDATE queries SET html = %s WHERE id = %s;', [html, i])
-    conn.commit()
     print('Retrieved HTML for question {0}: {1}'.format(i, question))
 
 def do_tasks(tasks):
@@ -46,7 +45,18 @@ def do_tasks(tasks):
         time.sleep(random.randint(2, 10))
 
 while True:
-    cur.execute('SELECT id, question FROM queries WHERE html IS NULL LIMIT %s;',
+    cur.execute(
+            '''
+            SELECT id, question 
+            FROM queries 
+            WHERE html IS NULL 
+            FOR UPDATE SKIP LOCKED 
+            LIMIT %s;
+            ''',
             [task_batch_size])
     do_tasks(cur.fetchmany(task_batch_size))
+    # "for update skip locked" means that we shouldn't commit until all tasks
+    # in a batch are done
+    conn.commit()
     print('Finished {0} tasks'.format(task_batch_size))
+
