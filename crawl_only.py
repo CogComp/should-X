@@ -5,12 +5,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 import psycopg2
 import os
+import sys
 import time
 import random
 import threading
 
 task_batch_size = 10
-concurrent_sessions = 3
+concurrent_sessions = 3 if len(sys.argv) < 2 else int(sys.argv[1])
 
 host = 'db-postgresql-sfo2-29804-do-user-1168167-0.a.db.ondigitalocean.com'
 
