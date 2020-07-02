@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import json
 
 from selenium import webdriver
@@ -8,7 +9,7 @@ chrome_options = Options()
 chrome_options.add_argument("--window-size=1024x768")
 # chrome_options.add_argument("--headless")
 chrome_options.add_argument('log-level=3')
-driver = webdriver.Chrome(chrome_options=chrome_options)
+driver = webdriver.Chrome(options=chrome_options)
 
 def ask_google(query):
     # Search for query
