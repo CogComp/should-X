@@ -4,12 +4,12 @@ import os
 
 app = Flask(__name__, static_url_path='')
 
-host = 'db-postgresql-sfo2-29804-do-user-1168167-0.a.db.ondigitalocean.com'
+host = '35.224.30.107'
 conn = psycopg2.connect(
     host=host,
-    port=25060,
-    dbname='defaultdb',
-    user='doadmin',
+    port=5432,
+    dbname='postgres',
+    user='postgres',
     password=os.getenv('DO_DB_PASSWORD'))
 cur = conn.cursor()
 

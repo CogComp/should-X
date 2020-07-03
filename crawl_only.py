@@ -13,8 +13,7 @@ import threading
 task_batch_size = 10
 concurrent_sessions = 3 if len(sys.argv) < 2 else int(sys.argv[1])
 
-host = 'db-postgresql-sfo2-29804-do-user-1168167-0.a.db.ondigitalocean.com'
-
+host = '35.224.30.107'
 
 class CrawlWindow(threading.Thread):
     count = 0
@@ -33,9 +32,9 @@ class CrawlWindow(threading.Thread):
 
         self.conn = psycopg2.connect(
             host=host,
-            port=25060,
-            dbname='defaultdb',
-            user='doadmin',
+            port=5432,
+            dbname='postgres',
+            user='postgres',
             password=os.getenv('DO_DB_PASSWORD'))
         self.cur = self.conn.cursor()
 
