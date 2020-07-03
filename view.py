@@ -24,7 +24,21 @@ def search_form(id = ''):
 
 @app.route('/')
 def welcome():
-    return '''<html><body>{0}</body></html>'''.format(search_form())
+    cur.execute('SELECT count(*) FROM queries WHERE html IS NOT NULL;')
+    scraped_count = cur.fetchone()[0]
+    cur.execute('SELECT count(*) FROM queries;')
+    all_count = cur.fetchone()[0]
+    percentage = '{:.2f}'.format(scraped_count * 100.0 / all_count)
+    scraped_str = '{:,}'.format(scraped_count)
+    all_str = '{:,}'.format(all_count)
+    return '''
+        <html>
+            <body>
+                <label for="scrape">Scraped {0} / {1} ({2}%): </label>
+                <progress id="scrape" value="{2}" max="100"></progress>
+                {3}
+            </body>
+        </html>'''.format(scraped_str, all_str, percentage, search_form())
 
 @app.route('/view.css')
 def css():
