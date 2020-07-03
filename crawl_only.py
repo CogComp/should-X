@@ -3,8 +3,8 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
+from gcp import connect_to_gcp
 import psycopg2
-import os
 import sys
 import time
 import random
@@ -12,8 +12,6 @@ import threading
 
 task_batch_size = 10
 concurrent_sessions = 3 if len(sys.argv) < 2 else int(sys.argv[1])
-
-host = '35.224.30.107'
 
 class CrawlWindow(threading.Thread):
     count = 0
@@ -30,15 +28,8 @@ class CrawlWindow(threading.Thread):
         chrome_options.add_argument('log-level=3')
         self.driver = webdriver.Chrome(options=chrome_options)
 
-        self.conn = psycopg2.connect(
-            host=host,
-            port=5432,
-            dbname='postgres',
-            user='postgres',
-            password=os.getenv('DO_DB_PASSWORD'))
-        self.cur = self.conn.cursor()
-
-        print('Window {0} successfully connected to {1}'.format(self.id, host))
+        self.conn, self.cur = connect_to_gcp()
+        print('Window {0} successfully connected to DB'.format(self.id))
 
     def ask_google(self, query):
         # Search for query

@@ -1,20 +1,13 @@
 from flask import Flask, request, send_from_directory
 import psycopg2
-import os
 import pytz
+import gcp
 
 app = Flask(__name__, static_url_path='')
 
 pst = pytz.timezone("US/Pacific")
 
-host = '35.224.30.107'
-conn = psycopg2.connect(
-    host=host,
-    port=5432,
-    dbname='postgres',
-    user='postgres',
-    password=os.getenv('DO_DB_PASSWORD'))
-cur = conn.cursor()
+conn, cur = gcp.connect_to_gcp()
 
 def search_form(id = ''):
  return '''
