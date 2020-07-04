@@ -49,6 +49,7 @@ def do_batch():
           AND e.short_answer IS NULL
           AND e.answer_type IS NULL
           AND (e.extract_v < %s OR e.extract_v IS NULL)
+        FOR UPDATE OF q SKIP LOCKED
         LIMIT %s;''',
         [version, batch_size])
 
