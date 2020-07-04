@@ -2,6 +2,7 @@ from flask import Flask, request, send_from_directory
 import psycopg2
 import pytz
 import gcp
+import re
 
 app = Flask(__name__, static_url_path='')
 
@@ -64,9 +65,22 @@ def css():
 
 @app.route('/questions')
 def show_html():
-    id = int(request.args.get('id'))
-    cur.execute('SELECT question, html FROM queries WHERE id = %s;', [id])
-    question, html = cur.fetchone()
+    id = int(re.sub('[^0-9]', '', request.args.get('id')))
+    cur.execute('''
+        SELECT
+          question, html, short_answer, e.answer, answer_type
+        FROM queries AS q
+        LEFT JOIN extractions AS e ON q.id = e.id
+        WHERE q.id = %s;''', [id])
+    question, html, short, long, answer_type = cur.fetchone()
+    short_str = '<strong>{0}</strong>'.format(short) if short else 'Unknown'
+    long_str = long if long else 'Unknown'
+    answer_type_str = answer_type if answer_type else 'Unknown'
+    if answer_type:
+        if not short:
+            short_str = 'N/A'
+        if not long:
+            long_str = 'N/A'
     return '''
         <html>
             <head>
@@ -75,10 +89,16 @@ def show_html():
             <body>
                 {2}
                 <h1 id="question">{0}</h1>
+                <table>
+                    <colgroup><col span="1" style="width:150px;"></colgroup>
+                    <tr><td>Answer Type</td><td>{5}</td></tr>
+                    <tr><td>Short answer</td><td>{3}</td></tr>
+                    <tr><td>Long answer</td><td>{4}</td></tr>
+                </table>
                 {1}
             </body>
         </html>
-    '''.format(question, html, search_form(id))
+    '''.format(question, html, search_form(id), short_str, long_str, answer_type_str)
 
 @app.route('/search')
 def show_search():
