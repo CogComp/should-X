@@ -29,13 +29,13 @@ class FeaturedSnippetHandler(HtmlHandler):
         short_answer = None
         if short_answer_div:
             short_answer = short_answer_div.get_text()
-            short_answer_div.decompose() # make it easier to find long answer
-        next_span = snippet.span
-        if next_span.parent.name != 'div': # there is no long answer; do not grab link as answer
-            print(next_span.parent.name)
+            short_answer_div.parent.decompose() # make it easier to find long answer
+        long_div = snippet.find('div', attrs={'role': 'heading'})
+        if long_div and long_div.span:
+            long_answer = long_div.span.get_text()
+            return 'feat_snip', short_answer, long_answer
+        else:
             return 'rich_snip', short_answer, None
-        long_answer = next_span.get_text()
-        return 'feat_snip', short_answer, long_answer
 
 handlers = [FeaturedSnippetHandler]
 
@@ -57,16 +57,28 @@ def do_batch():
         extraction_type = None
         short_answer = None
         long_answer = None
+        failed = False
+
         for potential_handler in handlers:
             handler = potential_handler(doc)
             if handler.can_handle():
-                extraction_type, short_answer, long_answer = handler.handle()
+                try:
+                    extraction_type, short_answer, long_answer = handler.handle()
+                except Exception as e:
+                    print('Extraction for {0} failed: {1}'.format(id, e))
+                    failed = True
                 break
+        if failed:
+            continue
+
+        long_str = long_answer
+        if long_str and len(long_str) > 50:
+            long_str = long_str[:24] + '...' + long_str[-23:]
         print('#{0}. Extraction: {1}. Short ans: {2}. Long ans: {3}'.format(
             id,
             extraction_type,
             short_answer,
-            long_answer[:35] if long_answer else None))
+            long_str))
         cur.execute('''
             INSERT INTO extractions (id, short_answer, answer, answer_type, extract_v)
             VALUES (%s, %s, %s, %s, %s)
