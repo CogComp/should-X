@@ -9,14 +9,19 @@ pst = pytz.timezone("US/Pacific")
 
 conn, cur = gcp.connect_to_gcp()
 
-def search_form(id = ''):
+def search_form(id = '', query = ''):
  return '''
     <form action="/questions" method="get">
         <label for="id">Enter question ID:</label>
         <input type="text" name="id" value="{0}">
         <input type="submit" value="Retrieve">
     </form>
-    '''.format(id)
+    <form action="/search" method="get">
+        <label for="query">Or enter in exact substring query:</label>
+        <input type="text" name="query" value="{1}">
+        <input type="submit" value="Search">
+    </form>
+    '''.format(id, query)
 
 @app.route('/')
 def welcome():
@@ -74,3 +79,22 @@ def show_html():
             </body>
         </html>
     '''.format(question, html, search_form(id))
+
+@app.route('/search')
+def show_search():
+    query = request.args.get('query')
+    cur.execute(
+            'SELECT id, question FROM queries WHERE html IS NOT NULL AND STRPOS(question, %s) > 0 LIMIT 10;', 
+            [query])
+    results_str = ''
+    for id, question in cur.fetchall():
+        results_str += '<li><a href="/questions?id={0}">{1}</a></li>'.format(id, question)
+    return '''
+        <html>
+            <body>
+                {2}
+                <h1>Scraped questions that have "{0}" as a substring:</h1>
+                <ul>{1}</ul>
+            </body>
+        </html>
+    '''.format(query, results_str, search_form(query=query))
