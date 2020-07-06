@@ -14,30 +14,19 @@ print('Connected to DB')
 # 反馈
 # 关于精选摘要
 
-class HtmlHandler:
-    def __init__(self, doc):
-        self.doc = doc
-
-class FeaturedSnippetHandler(HtmlHandler):
-    def can_handle(self):
-        self.featured = self.doc.find('h2', text='Featured snippet from the web')
-        return self.featured is not None
-
-    def handle(self):
-        snippet = self.featured.parent.div
-        short_answer_div = snippet.find('div', attrs={'data-tts': 'answers'})
-        short_answer = None
-        if short_answer_div:
-            short_answer = short_answer_div.get_text()
-            short_answer_div.parent.decompose() # make it easier to find long answer
-        long_div = snippet.find('div', attrs={'role': 'heading'})
-        if long_div and long_div.span:
-            long_answer = long_div.span.get_text()
-            return 'feat_snip', short_answer, long_answer
-        else:
-            return 'rich_snip', short_answer, None
-
-handlers = [FeaturedSnippetHandler]
+def handle_featured_snippet(featured):
+    snippet = featured.parent.div
+    short_answer_div = snippet.find('div', attrs={'data-tts': 'answers'})
+    short_answer = None
+    if short_answer_div:
+        short_answer = short_answer_div.get_text()
+        short_answer_div.parent.decompose() # make it easier to find long answer
+    long_div = snippet.find('div', attrs={'role': 'heading'})
+    if long_div and long_div.span:
+        long_answer = long_div.span.get_text()
+        return 'feat_snip', short_answer, long_answer
+    else:
+        return 'rich_snip', short_answer, None
 
 def do_batch():
     cur.execute('''
@@ -54,30 +43,27 @@ def do_batch():
         [version, batch_size])
 
     for id, html in cur.fetchall():
-        doc = BeautifulSoup(html, 'html.parser')
         extraction_type = None
         short_answer = None
         long_answer = None
-        failed = False
 
-        for potential_handler in handlers:
-            handler = potential_handler(doc)
-            if handler.can_handle():
-                try:
-                    extraction_type, short_answer, long_answer = handler.handle()
-                except Exception as e:
-                    print('Extraction for {0} failed: {1}'.format(id, e))
-                    failed = True
-                break
-        if failed:
+        doc = BeautifulSoup(html, 'html.parser')
+        featured = doc.h2
+        featured_type = featured.get_text()
+
+        try:
+            if featured_type == 'Featured snippet from the web':
+                extraction_type, short_answer, long_answer = handle_featured_snippet(featured)
+        except Exception as e:
+            print('Extraction for {0} failed: {1}'.format(id, e))
             continue
 
         long_str = long_answer
         if long_str and len(long_str) > 50:
             long_str = long_str[:24] + '...' + long_str[-23:]
-        print('#{0}. Extraction: {1}. Short ans: {2}. Long ans: {3}'.format(
+        print('{0:7} {1:10} Short ans: {2}. Long ans: {3}'.format(
             id,
-            extraction_type,
+            str(extraction_type),
             short_answer,
             long_str))
         cur.execute('''
