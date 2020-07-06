@@ -3,7 +3,7 @@
 import gcp
 from bs4 import BeautifulSoup
 
-version = 1 # increment version to go through pages we are uncertain about again
+version = 2 # increment version to go through pages we are uncertain about again
 batch_size = 20
 
 conn, cur = gcp.connect_to_gcp()
@@ -28,6 +28,9 @@ def handle_featured_snippet(featured):
     else:
         return 'rich_snip', short_answer, None
 
+def handle_no_snippet(featured):
+    return 'no_answer', None, None
+
 def do_batch():
     cur.execute('''
         SELECT q.id, html
@@ -49,11 +52,27 @@ def do_batch():
 
         doc = BeautifulSoup(html, 'html.parser')
         featured = doc.h2
-        featured_type = featured.get_text()
+        featured_type = featured.get_text() if featured else None
+
+        # Examples of ones where featured snippets do not include h2
+        # 1389251 
+        # 1389246 
+        # 1389247 
 
         try:
             if featured_type == 'Featured snippet from the web':
                 extraction_type, short_answer, long_answer = handle_featured_snippet(featured)
+            elif featured_type == 'People also ask' and doc.find('div', {'class': 'kp-header'}) is None:
+                # featured answers come before this, so if we see this as the first h2, that means
+                # there were no featured answers
+                extraction_type, short_answer, long_answer = handle_no_snippet(featured)
+            elif featured_type == 'Web results' and doc.find('div', {'class': 'kp-header'}) is None:
+                extraction_type, short_answer, long_answer = handle_no_snippet(featured)
+            elif featured_type is None and doc.find('div', {'class': 'kp-header'}) is None:
+                # featured answers always start with an h2
+                extraction_type, short_answer, long_answer = handle_no_snippet(featured)
+            else:
+                print('        Unknown featured display "{0}"'.format(featured_type))
         except Exception as e:
             print('Extraction for {0} failed: {1}'.format(id, e))
             continue
