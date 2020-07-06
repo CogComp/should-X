@@ -31,6 +31,10 @@ def handle_featured_snippet(featured):
 def handle_no_snippet(featured):
     return 'no_answer', None, None
 
+def has_no_other_answer_markers(doc):
+    return doc.find('div', {'class': 'kp-header'}) is None and \
+            doc.find('div', {'class': 'answered-question'}) is None
+
 def do_batch():
     cur.execute('''
         SELECT q.id, html
@@ -59,16 +63,19 @@ def do_batch():
         # 1389246 
         # 1389247 
 
+        # Example of one where it doesn't include 'kp-header' (it does include "answered-question")
+        # 41802
+
         try:
             if featured_type == 'Featured snippet from the web':
                 extraction_type, short_answer, long_answer = handle_featured_snippet(featured)
-            elif featured_type == 'People also ask' and doc.find('div', {'class': 'kp-header'}) is None:
+            elif featured_type == 'People also ask' and has_no_other_answer_markers(doc):
                 # featured answers come before this, so if we see this as the first h2, that means
                 # there were no featured answers
                 extraction_type, short_answer, long_answer = handle_no_snippet(featured)
-            elif featured_type == 'Web results' and doc.find('div', {'class': 'kp-header'}) is None:
+            elif featured_type == 'Web results' and has_no_other_answer_markers(doc):
                 extraction_type, short_answer, long_answer = handle_no_snippet(featured)
-            elif featured_type is None and doc.find('div', {'class': 'kp-header'}) is None:
+            elif featured_type is None and has_no_other_answer_markers(doc):
                 # featured answers always start with an h2
                 extraction_type, short_answer, long_answer = handle_no_snippet(featured)
             else:
