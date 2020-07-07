@@ -37,7 +37,7 @@ def handle_unit_converter(featured, question):
     if unit:
         unit_value = unit.get_text()
     else: # see 13783 and 19581
-        unit_value = question.split(' is how many ')[1]
+        unit_value = question.split(' how many ')[1]
     short_answer = '{0} {1}'.format(count_value, unit_value)
     return 'unit_conv', short_answer, None
 
