@@ -46,7 +46,7 @@ def handle_unit_converter(featured, question):
         if unit_value is None:
             unit_value = get_split(question, ' equal to ')
 
-    short_answer = count_value
+    short_answer = count_value # sometimes it's just PEBKAC and no units available; see 20802
     if unit_value:
         short_answer = '{0} {1}'.format(count_value, unit_value)
     return 'unit_conv', short_answer, None
