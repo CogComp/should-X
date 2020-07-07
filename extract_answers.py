@@ -3,7 +3,7 @@
 import gcp
 from bs4 import BeautifulSoup
 
-version = 2 # increment version to go through pages we are uncertain about again
+version = 3 # increment version to go through pages we are uncertain about again
 batch_size = 20
 
 conn, cur = gcp.connect_to_gcp()
@@ -27,6 +27,15 @@ def handle_featured_snippet(featured):
         return 'feat_snip', short_answer, long_answer
     else:
         return 'rich_snip', short_answer, None
+
+def handle_unit_converter(featured):
+    equals = featured.parent.div(text='=')[0]
+    count = equals.find_next('input')
+    count_value = count.get('value')
+    unit = count.find_next('option', {'selected': '1'})
+    unit_value = unit.get_text()
+    short_answer = '{0} {1}'.format(count_value, unit_value)
+    return 'unit_conv', short_answer, None
 
 def handle_no_snippet(featured):
     return 'no_answer', None, None
@@ -69,6 +78,8 @@ def do_batch():
         try:
             if featured_type == 'Featured snippet from the web':
                 extraction_type, short_answer, long_answer = handle_featured_snippet(featured)
+            elif featured_type == 'Unit Converter':
+                extraction_type, short_answer, long_answer = handle_unit_converter(featured)
             elif featured_type == 'People also ask' and has_no_other_answer_markers(doc):
                 # featured answers come before this, so if we see this as the first h2, that means
                 # there were no featured answers
