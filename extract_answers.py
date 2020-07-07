@@ -3,7 +3,7 @@
 import gcp
 from bs4 import BeautifulSoup
 
-version = 6 # increment version to go through pages we are uncertain about again
+version = 7 # increment version to go through pages we are uncertain about again
 batch_size = 20
 
 conn, cur = gcp.connect_to_gcp()
@@ -67,6 +67,10 @@ def handle_translation_result(featured):
 def handle_local_results(featured):
     return 'local_rst', None, None
 
+def handle_local_time_conversion(featured):
+    short_answer = featured.parent.find('div', {'class': 'vk_bk'}).get_text()
+    return 'time_conv', short_answer, None
+
 def handle_no_snippet(featured):
     return 'no_answer', None, None
 
@@ -117,6 +121,8 @@ def do_batch():
                 extraction_type, short_answer, long_answer = handle_translation_result(featured)
             elif featured_type == 'local results':
                 extraction_type, short_answer, long_answer = handle_local_results(featured)
+            elif featured_type == 'local time conversion':
+                extraction_type, short_answer, long_answer = handle_local_time_conversion(featured)
             elif has_no_other_answer_markers(doc) and ( \
                 featured_type == 'web results' or
                 featured_type == 'people also ask' or
