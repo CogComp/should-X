@@ -64,6 +64,9 @@ def handle_translation_result(featured):
     short_answer = featured.parent.find('pre', {'id': 'tw-target-text'}).get_text()
     return 'tr_result', short_answer, None
 
+def handle_local_results(featured):
+    return 'local_rst', None, None
+
 def handle_no_snippet(featured):
     return 'no_answer', None, None
 
@@ -77,7 +80,6 @@ def do_batch():
         FROM queries AS q
           LEFT JOIN extractions AS e ON q.id = e.id
         WHERE q.html IS NOT NULL 
-          AND e.id = 452538
           AND e.answer IS NULL
           AND e.short_answer IS NULL
           AND e.answer_type IS NULL
@@ -113,6 +115,8 @@ def do_batch():
                 extraction_type, short_answer, long_answer = handle_currency_converter(featured)
             elif featured_type == 'translation result':
                 extraction_type, short_answer, long_answer = handle_translation_result(featured)
+            elif featured_type == 'local results':
+                extraction_type, short_answer, long_answer = handle_local_results(featured)
             elif has_no_other_answer_markers(doc) and ( \
                 featured_type == 'web results' or
                 featured_type == 'people also ask' or
