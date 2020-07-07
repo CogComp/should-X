@@ -3,7 +3,7 @@
 import gcp
 from bs4 import BeautifulSoup
 
-version = 5 # increment version to go through pages we are uncertain about again
+version = 6 # increment version to go through pages we are uncertain about again
 batch_size = 20
 
 conn, cur = gcp.connect_to_gcp()
@@ -77,6 +77,7 @@ def do_batch():
         FROM queries AS q
           LEFT JOIN extractions AS e ON q.id = e.id
         WHERE q.html IS NOT NULL 
+          AND e.id = 452538
           AND e.answer IS NULL
           AND e.short_answer IS NULL
           AND e.answer_type IS NULL
@@ -92,7 +93,8 @@ def do_batch():
 
         doc = BeautifulSoup(html, 'html.parser')
         featured = doc.h2
-        featured_type = featured.get_text() if featured else None
+        # the casing in the html is inconsistent, so just always lowercase
+        featured_type = featured.get_text().lower() if featured else None
 
         # Examples of ones where featured snippets do not include h2
         # 1389251 
@@ -103,22 +105,19 @@ def do_batch():
         # 41802
 
         try:
-            if featured_type == 'Featured snippet from the web':
+            if featured_type == 'featured snippet from the web':
                 extraction_type, short_answer, long_answer = handle_featured_snippet(featured)
-            elif featured_type == 'Unit Converter':
+            elif featured_type == 'unit converter':
                 extraction_type, short_answer, long_answer = handle_unit_converter(featured, question)
-            elif featured_type == 'Currency Converter':
+            elif featured_type == 'currency converter':
                 extraction_type, short_answer, long_answer = handle_currency_converter(featured)
-            elif featured_type == 'Translation Result':
+            elif featured_type == 'translation result':
                 extraction_type, short_answer, long_answer = handle_translation_result(featured)
-            elif featured_type == 'People also ask' and has_no_other_answer_markers(doc):
-                # featured answers come before this, so if we see this as the first h2, that means
-                # there were no featured answers
-                extraction_type, short_answer, long_answer = handle_no_snippet(featured)
-            elif featured_type == 'Web results' and has_no_other_answer_markers(doc):
-                extraction_type, short_answer, long_answer = handle_no_snippet(featured)
-            elif featured_type is None and has_no_other_answer_markers(doc):
-                # featured answers always start with an h2
+            elif has_no_other_answer_markers(doc) and ( \
+                featured_type == 'web results' or
+                featured_type == 'people also ask' or
+                featured_type == 'web result with site links' or
+                featured_type is None):
                 extraction_type, short_answer, long_answer = handle_no_snippet(featured)
             else:
                 print('        Unknown featured display "{0}"'.format(featured_type))
