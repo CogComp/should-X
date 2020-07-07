@@ -28,6 +28,11 @@ def handle_featured_snippet(featured):
     else:
         return 'rich_snip', short_answer, None
 
+def get_split(question, delimiter):
+    split = question.split(delimiter)
+    if len(split) == 2 and len(split[1]) > 0:
+        return split[1]
+
 def handle_unit_converter(featured, question):
     equals = featured.parent.div(text='=')[0]
     count = equals.find_next('input')
@@ -37,8 +42,13 @@ def handle_unit_converter(featured, question):
     if unit:
         unit_value = unit.get_text()
     else: # see 13783 and 19581
-        unit_value = question.split(' how many ')[1]
-    short_answer = '{0} {1}'.format(count_value, unit_value)
+        unit_value = get_split(question, ' how many ')
+        if unit_value is None:
+            unit_value = get_split(question, ' equal to ')
+
+    short_answer = count_value
+    if unit_value:
+        short_answer = '{0} {1}'.format(count_value, unit_value)
     return 'unit_conv', short_answer, None
 
 def handle_currency_converter(featured):
