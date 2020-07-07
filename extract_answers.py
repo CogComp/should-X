@@ -28,12 +28,16 @@ def handle_featured_snippet(featured):
     else:
         return 'rich_snip', short_answer, None
 
-def handle_unit_converter(featured):
+def handle_unit_converter(featured, question):
     equals = featured.parent.div(text='=')[0]
     count = equals.find_next('input')
     count_value = count.get('value')
     unit = count.find_next('option', {'selected': '1'})
-    unit_value = unit.get_text()
+    unit_value = ''
+    if unit:
+        unit_value = unit.get_text()
+    else: # see 13783 and 19581
+        unit_value = question.split(' is how many ')[1]
     short_answer = '{0} {1}'.format(count_value, unit_value)
     return 'unit_conv', short_answer, None
 
@@ -59,7 +63,7 @@ def has_no_other_answer_markers(doc):
 
 def do_batch():
     cur.execute('''
-        SELECT q.id, html
+        SELECT q.id, question, html
         FROM queries AS q
           LEFT JOIN extractions AS e ON q.id = e.id
         WHERE q.html IS NOT NULL 
@@ -71,7 +75,7 @@ def do_batch():
         LIMIT %s;''',
         [version, batch_size])
 
-    for id, html in cur.fetchall():
+    for id, question, html in cur.fetchall():
         extraction_type = None
         short_answer = None
         long_answer = None
@@ -92,7 +96,7 @@ def do_batch():
             if featured_type == 'Featured snippet from the web':
                 extraction_type, short_answer, long_answer = handle_featured_snippet(featured)
             elif featured_type == 'Unit Converter':
-                extraction_type, short_answer, long_answer = handle_unit_converter(featured)
+                extraction_type, short_answer, long_answer = handle_unit_converter(featured, question)
             elif featured_type == 'Currency Converter':
                 extraction_type, short_answer, long_answer = handle_currency_converter(featured)
             elif featured_type == 'Translation Result':
