@@ -14,8 +14,7 @@ print('Connected to DB')
 # 反馈
 # 关于精选摘要
 
-def handle_featured_snippet(featured):
-    snippet = featured.parent.div
+def handle_featured_snippet(snippet):
     short_answer_div = snippet.find('div', attrs={'data-tts': 'answers'})
     short_answer = None
     if short_answer_div:
@@ -92,6 +91,7 @@ def do_batch():
         FROM queries AS q
           LEFT JOIN extractions AS e ON q.id = e.id
         WHERE q.html IS NOT NULL 
+          AND e.id = 1159889
           AND e.answer IS NULL
           AND e.short_answer IS NULL
           AND e.answer_type IS NULL
@@ -120,7 +120,8 @@ def do_batch():
 
         try:
             if featured_type == 'featured snippet from the web':
-                extraction_type, short_answer, long_answer = handle_featured_snippet(featured)
+                snippet = featured.parent.div
+                extraction_type, short_answer, long_answer = handle_featured_snippet(snippet)
             elif featured_type == 'unit converter':
                 extraction_type, short_answer, long_answer = handle_unit_converter(featured, question)
             elif featured_type == 'currency converter':
@@ -142,7 +143,11 @@ def do_batch():
                 featured_type is None):
                 extraction_type, short_answer, long_answer = handle_no_snippet(featured)
             else:
-                print('        Unknown featured display "{0}"'.format(featured_type))
+                answered_div = doc.find('div', {'class': 'answered-question'})
+                if answered_div:
+                    extraction_type, short_answer, long_answer = handle_featured_snippet(answered_div)
+                else:
+                    print('        Unknown featured display "{0}"'.format(featured_type))
         except Exception as e:
             print('Extraction for {0} failed: {1}'.format(id, e))
             continue
