@@ -71,6 +71,11 @@ def handle_local_time_conversion(featured):
     short_answer = featured.parent.find('div', {'class': 'vk_bk'}).get_text()
     return 'time_conv', short_answer, None
 
+def handle_local_time(featured):
+    # strip because sometimes there's whitespace at the end due to div spacing
+    short_answer = featured.parent.find('div', {'class': 'vk_bk'}).get_text().strip()
+    return 'localtime', short_answer, None
+
 def handle_no_snippet(featured):
     return 'no_answer', None, None
 
@@ -123,6 +128,8 @@ def do_batch():
                 extraction_type, short_answer, long_answer = handle_local_results(featured)
             elif featured_type == 'local time conversion':
                 extraction_type, short_answer, long_answer = handle_local_time_conversion(featured)
+            elif featured_type == 'local time':
+                extraction_type, short_answer, long_answer = handle_local_time(featured)
             elif has_no_other_answer_markers(doc) and ( \
                 featured_type == 'web results' or
                 featured_type == 'people also ask' or
