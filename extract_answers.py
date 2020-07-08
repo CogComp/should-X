@@ -3,7 +3,7 @@
 import gcp
 from bs4 import BeautifulSoup
 
-version = 7 # increment version to go through pages we are uncertain about again
+version = 8 # increment version to go through pages we are uncertain about again
 batch_size = 20
 
 conn, cur = gcp.connect_to_gcp()
@@ -85,6 +85,9 @@ def handle_kp_header(header):
 def handle_directions(featured):
     return 'direction', None, None
 
+def handle_description(featured):
+    return 'descript', None, None
+
 def handle_no_snippet(featured):
     return 'no_answer', None, None
 
@@ -144,6 +147,8 @@ def do_batch():
                 extraction_type, short_answer, long_answer = handle_weather(featured)
             elif featured_type == 'directions':
                 extraction_type, short_answer, long_answer = handle_directions(featured)
+            elif featured_type == 'description':
+                extraction_type, short_answer, long_answer = handle_description(featured)
             elif has_no_other_answer_markers(doc) and ( \
                 featured_type == 'web results' or
                 featured_type == 'people also ask' or
