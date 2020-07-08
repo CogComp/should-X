@@ -82,6 +82,9 @@ def handle_kp_header(header):
     short_answer = header.find('div', {'class': 'gsrt'}).div.get_text()
     return 'knowledge', short_answer, None
 
+def handle_directions(featured):
+    return 'direction', None, None
+
 def handle_no_snippet(featured):
     return 'no_answer', None, None
 
@@ -94,7 +97,7 @@ def do_batch():
         SELECT q.id, question, html
         FROM queries AS q
           LEFT JOIN extractions AS e ON q.id = e.id
-        WHERE q.html IS NOT NULL 
+        WHERE q.html IS NOT NULL
           AND e.answer IS NULL
           AND e.short_answer IS NULL
           AND e.answer_type IS NULL
@@ -139,6 +142,8 @@ def do_batch():
                 extraction_type, short_answer, long_answer = handle_local_time(featured)
             elif featured_type == 'weather result':
                 extraction_type, short_answer, long_answer = handle_weather(featured)
+            elif featured_type == 'directions':
+                extraction_type, short_answer, long_answer = handle_directions(featured)
             elif has_no_other_answer_markers(doc) and ( \
                 featured_type == 'web results' or
                 featured_type == 'people also ask' or
