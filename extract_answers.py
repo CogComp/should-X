@@ -79,8 +79,12 @@ def handle_weather(featured):
     return 'weather', None, None
 
 def handle_kp_header(header):
-    short_answer = header.find('div', {'class': 'gsrt'}).div.get_text()
-    return 'knowledge', short_answer, None
+    gsrt = header.find('div', {'class': 'gsrt'})
+    if gsrt:
+        short_answer = gsrt.div.get_text()
+        return 'knowledge', short_answer, None
+    else:
+        return None, None, None
 
 def handle_directions(featured):
     return 'direction', None, None
