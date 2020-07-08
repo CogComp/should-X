@@ -181,8 +181,12 @@ def do_batch():
             str(extraction_type),
             short_answer,
             long_str))
-        if len(short_answer) <= 100:
-            cur.execute('''
+        if short_answer and len(short_answer) > 100: # example: 80100
+            print('TODO: Fix length for {0}'.format(id))
+            short_answer = None
+            answer = None
+            answer_type = None
+        cur.execute('''
             INSERT INTO extractions (id, short_answer, answer, answer_type, extract_v)
             VALUES (%s, %s, %s, %s, %s)
             ON CONFLICT (id)
@@ -192,9 +196,7 @@ def do_batch():
                 answer = EXCLUDED.answer,
                 answer_type = EXCLUDED.answer_type,
                 extract_v = EXCLUDED.extract_v;
-            ''', [id, short_answer, long_answer, extraction_type, version])
-        else: # example: 80100
-            print('TODO: Fix length for {0}'.format(id))
+        ''', [id, short_answer, long_answer, extraction_type, version])
     conn.commit()
     print('Extracted from {0} pages'.format(batch_size))
 
