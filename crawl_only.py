@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from gcp import connect_to_gcp
+from fake_useragent import UserAgent
 import psycopg2
 import sys
 import time
@@ -12,6 +13,7 @@ import threading
 
 task_batch_size = 10
 concurrent_sessions = 3 if len(sys.argv) < 2 else int(sys.argv[1])
+ua = UserAgent()
 
 class CrawlWindow(threading.Thread):
     count = 0
@@ -26,6 +28,9 @@ class CrawlWindow(threading.Thread):
         chrome_options.add_argument("--window-size=1024x768")
         # chrome_options.add_argument("--headless")
         chrome_options.add_argument('log-level=3')
+        agent = ua.random
+        print('Window {0} using user agent {1}'.format(self.id, agent))
+        chrome_options.add_argument('user-agent={0}'.format(ua.random))
         self.driver = webdriver.Chrome(options=chrome_options)
 
         self.conn, self.cur = connect_to_gcp()
