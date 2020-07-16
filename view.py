@@ -104,7 +104,7 @@ def show_html():
 def show_search():
     query = request.args.get('query')
     cur.execute(
-            'SELECT id, question FROM queries WHERE html IS NOT NULL AND STRPOS(question, %s) > 0 LIMIT 10;', 
+            'SELECT id, question FROM queries WHERE html IS NOT NULL AND STRPOS(question, %s) > 0 LIMIT 500;', 
             [query])
     results_str = ''
     for id, question in cur.fetchall():
