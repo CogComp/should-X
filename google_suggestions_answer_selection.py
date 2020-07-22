@@ -2,11 +2,11 @@ from google_suggest import query_patterns
 import random
 
 def main():
-    # extract_clean_subset()
-    print_clean_subset()
+    extract_clean_subset()
+    #print_clean_subset()
 
 def extract_clean_subset():
-    outfile = open("questions_faster3_clean_june26_2020.txt", "+w")
+    outfile = open("questions_faster3_clean_july22_2020.txt", "+w")
     total = 0
     with open("questions_faster3.txt") as f:
         all_lines = list(f.readlines())
