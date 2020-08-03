@@ -5,9 +5,9 @@ import random
 
 
 def main():
-    # extract_clean_subset()
+    extract_clean_subset()
     # print_clean_subset()
-    compute_overlap_with_nq()
+    # compute_overlap_with_nq()
 
 
 def compute_overlap_with_nq():
@@ -28,7 +28,7 @@ def compute_overlap_with_nq():
     print(total)
 
 def extract_clean_subset():
-    outfile = open("questions_faster3_clean_june26_2020.txt", "+w")
+    outfile = open("questions_faster3_clean_aug3_2020.txt", "+w")
     total = 0
     with open("questions_faster3.txt") as f:
         all_lines = list(f.readlines())
@@ -88,7 +88,7 @@ def is_clean(query):
             return False
 
         if query[0] == "#" or query[0] == "$" or query[0] == "." or query[0] == "/" or query[0] == "&" or \
-                query[0] == "("  or query[0] == ")" or query[0] == "•":
+                query[0] == "("  or query[0] == ")" or query[0] == "•" or query[0] == "*" or query[0] == "-" or query[0] == "0":
             return False
 
         if "�" in query:
