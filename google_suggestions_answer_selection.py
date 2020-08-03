@@ -1,9 +1,31 @@
+from tqdm import tqdm
+
 from google_suggest import query_patterns
 import random
 
+
 def main():
     # extract_clean_subset()
-    print_clean_subset()
+    # print_clean_subset()
+    compute_overlap_with_nq()
+
+
+def compute_overlap_with_nq():
+
+    with open("questions_faster3.txt") as f:
+        all_lines = [line.replace("\n", "").lower() + "?" for line in f.readlines()]
+
+    covered = 0
+    total = 0
+    with open("/Users/danielk/ideaProjects/t2t-qa/t2t-data/natural_questions/train.tsv") as f:
+        for line in tqdm(f.readlines()):
+            total += 1
+            question = line.split("\t")[0].lower()
+            if question in all_lines:
+                covered += 1
+
+    print(covered)
+    print(total)
 
 def extract_clean_subset():
     outfile = open("questions_faster3_clean_june26_2020.txt", "+w")
@@ -14,7 +36,7 @@ def extract_clean_subset():
             line = line.replace("\n", "")
             if is_clean(line):
                 # print(f" ** {line} -> {is_clean(line)}")
-                outfile.write(line)
+                outfile.write(line + "\n")
                 total += 1
     print(f" * total of clean questions: {total}")
 
@@ -40,14 +62,20 @@ def print_clean_subset():
         print(f" * clean queries: {len(clean_lines)}")
         print(f" * all queries: {len(all_lines)}")
 
+
 import re
+
 number_may_space = re.compile(r'\d may ')
 number_may_end = re.compile(r'\d may$')
 space_may_numbers = re.compile(r' may \d\d')
 begin_may_numbers = re.compile(r'^may \d\d')
 
+
 def is_clean(query):
     matching_patterns = [q for q in query_patterns if q in f" {query} "]
+
+    query = query.strip()
+
     if len(matching_patterns) > 0:
 
         if " may " in matching_patterns and len(matching_patterns) == 1:
@@ -56,7 +84,21 @@ def is_clean(query):
         if "which of the following" in query:
             return False
 
-        if len(query.split(" ")) < 3:
+        if len(query.split(" ")) < 5:
+            return False
+
+        if query[0] == "#" or query[0] == "$" or query[0] == "." or query[0] == "/" or query[0] == "&" or \
+                query[0] == "("  or query[0] == ")" or query[0] == "•":
+            return False
+
+        if "�" in query:
+            return False
+
+        if query.endswith("lyric") or query.endswith("lyrics") or query.endswith("quote") or query.endswith("quotes") or \
+                query.endswith("download 720p") or query.endswith("download"):
+            return False
+
+        if query.endswith("quotes"):
             return False
 
         # # skip is it is of the form `d may`, `may dd`, etc.
