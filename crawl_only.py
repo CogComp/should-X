@@ -10,6 +10,7 @@ import sys
 import time
 import random
 import threading
+import urllib.parse
 
 task_batch_size = 10
 concurrent_sessions = 3 if len(sys.argv) < 2 else int(sys.argv[1])
@@ -38,7 +39,7 @@ class CrawlWindow(threading.Thread):
 
     def ask_google(self, query):
         # Search for query
-        query = query.replace(' ', '+')
+        query = urllib.parse.quote(query)
         self.driver.get('http://www.google.com/search?q=' + query)
 
         # Get HTML only
