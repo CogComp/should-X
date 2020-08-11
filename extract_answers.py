@@ -27,7 +27,7 @@ def handle_featured_snippet(snippet):
     else:
         ol = snippet.find('ol')
         ul = snippet.find('ul')
-        if ol and ol.find('li').get_text() != 'Cached':
+        if ol and not ol.has_attr('role'): # see 6916 and 4143239
             long_list = [x.get_text() for x in ol.find_all('li')]
             return 'rich_list', short_answer, str(long_list)
         elif ul:
@@ -114,6 +114,7 @@ def do_batch():
         FROM queries AS q
           LEFT JOIN extractions AS e ON q.id = e.id
         WHERE q.html IS NOT NULL
+          and q.id = 6916
           AND e.answer IS NULL
           AND e.short_answer IS NULL
           AND e.answer_type IS NULL
