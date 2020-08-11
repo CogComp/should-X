@@ -114,7 +114,6 @@ def do_batch():
         FROM queries AS q
           LEFT JOIN extractions AS e ON q.id = e.id
         WHERE q.html IS NOT NULL
-          and q.id = 6916
           AND e.answer IS NULL
           AND e.short_answer IS NULL
           AND e.answer_type IS NULL
