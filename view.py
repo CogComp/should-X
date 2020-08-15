@@ -3,6 +3,7 @@ import psycopg2
 import pytz
 import gcp
 import re
+import ast
 
 app = Flask(__name__, static_url_path='')
 
@@ -87,6 +88,10 @@ def show_html():
             short_str = 'N/A'
         if not long:
             long_str = 'N/A'
+    if answer_type == 'rich_set' or answer_type == 'rich_list':
+        list = ast.literal_eval(long)
+        list_type = 'ul' if answer_type == 'rich_list' else 'ul'
+        long_str = '<{0}>{1}</{0}>'.format(list_type, ''.join(['<li>{0}</li>'.format(x) for x in list]))
     return '''
         <html>
             <head>

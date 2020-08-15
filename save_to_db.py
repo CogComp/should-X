@@ -5,21 +5,17 @@ import re
 import sys
 import psycopg2
 import os
+import gcp
 
 start = int(sys.argv[2]) if len(sys.argv) >= 3 else 0
 line_count = start
 processed_count = 0
 commit_size = 100
 
-host = 'localhost'
-conn = psycopg2.connect(
-        port=5432,
-        dbname='defaultdb')
-cur = conn.cursor()
-print('Successfully connected to {0}'.format(host))
+conn, cur = gcp.connect_to_gcp()
 
 def insert_question(question):
-    cur.execute('INSERT INTO queries (question) VALUES (%s);', [question])
+    cur.execute('INSERT INTO queries (question) VALUES (%s) ON CONFLICT DO NOTHING;', [question])
 
 with open(sys.argv[1], 'r') as queries:
     # skip first few lines, in case it failed and this is simply continuing from where
@@ -28,9 +24,9 @@ with open(sys.argv[1], 'r') as queries:
         line_count += 1
         line = line.strip()
         # avoid using \w in regex in case Unicode characters get matched too
-        if re.search('^[ a-zA-Z0-9]+$', line):
-            insert_question(line)
-            processed_count += 1
+        #if re.search('^[ a-zA-Z0-9]+$', line):
+        insert_question(line)
+        processed_count += 1
         
         if processed_count > 0 and processed_count % commit_size == 0:
             conn.commit()
