@@ -3,6 +3,7 @@ import psycopg2
 import pytz
 import gcp
 import re
+import ast
 
 app = Flask(__name__, static_url_path='')
 
@@ -44,8 +45,14 @@ def welcome():
     speed = (count2 - count1) * 1.0 / time_diff
 
     remaining_scrapes = all_count - scraped_count
-    remaining_seconds = remaining_scrapes / speed
-    remaining_days = remaining_seconds / 3600 / 24
+    remaining_days = ''
+    if remaining_scrapes == 0:
+        remaining_days = '0'
+    elif speed == 0:
+        remaining_days = 'Inf'
+    else:
+        remaining_seconds = remaining_scrapes / speed
+        remaining_days = '{0:.2f}'.format(remaining_seconds / 3600 / 24)
 
     return '''
         <html>
@@ -54,7 +61,7 @@ def welcome():
                     <label for="scrape">Scraped {0} / {1} ({2}%): </label>
                     <progress id="scrape" value="{2}" max="100"></progress>
                 </div>
-                Speed: {5:.2f} scrapes / second => {6:.2f} days remaining (Last updated at {3})
+                Speed: {5:.2f} scrapes / second => {6} days remaining (Last updated at {3})
                 {4}
             </body>
         </html>'''.format(scraped_str, all_str, percentage, latest_str, search_form(), speed, remaining_days)
@@ -81,6 +88,10 @@ def show_html():
             short_str = 'N/A'
         if not long:
             long_str = 'N/A'
+    if answer_type == 'rich_set' or answer_type == 'rich_list':
+        list = ast.literal_eval(long)
+        list_type = 'ul' if answer_type == 'rich_list' else 'ul'
+        long_str = '<{0}>{1}</{0}>'.format(list_type, ''.join(['<li>{0}</li>'.format(x) for x in list]))
     return '''
         <html>
             <head>

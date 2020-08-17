@@ -2,3 +2,4 @@ questions_faster2.txt filter=lfs diff=lfs merge=lfs -text
 questions_faster3.txt filter=lfs diff=lfs merge=lfs -text
 questions_faster3_clean_june26_2020.txt filter=lfs diff=lfs merge=lfs -text
 questions_faster3_clean_july22_2020.txt filter=lfs diff=lfs merge=lfs -text
+questions_faster3_clean_aug3_2020.txt filter=lfs diff=lfs merge=lfs -text

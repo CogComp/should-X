@@ -3,16 +3,12 @@
 import gcp
 from bs4 import BeautifulSoup
 
-version = 8 # increment version to go through pages we are uncertain about again
+version = 10 # increment version to go through pages we are uncertain about again
 batch_size = 20
 
 conn, cur = gcp.connect_to_gcp()
 
 print('Connected to DB')
-
-# 详细内容
-# 反馈
-# 关于精选摘要
 
 def handle_featured_snippet(snippet):
     short_answer_div = snippet.find('div', attrs={'data-tts': 'answers'})
@@ -25,7 +21,16 @@ def handle_featured_snippet(snippet):
         long_answer = long_div.span.get_text()
         return 'feat_snip', short_answer, long_answer
     else:
-        return 'rich_snip', short_answer, None
+        ol = snippet.find('ol')
+        ul = snippet.find('ul')
+        if ol and not ol.has_attr('role'): # see 6916 and 4143239
+            long_list = [x.get_text() for x in ol.find_all('li')]
+            return 'rich_list', short_answer, str(long_list)
+        elif ul:
+            long_list = [x.get_text() for x in ul.find_all('li')]
+            return 'rich_set', short_answer, str(long_list)
+        else:
+            return 'rich_snip', short_answer, None
 
 def get_split(question, delimiter):
     split = question.split(delimiter)
@@ -92,6 +97,10 @@ def handle_directions(featured):
 def handle_description(featured):
     return 'descript', None, None
 
+def handle_overview(doc):
+    short_ans = doc.a.get_text()
+    return 'overview', short_ans, None
+
 def handle_no_snippet(featured):
     return 'no_answer', None, None
 
@@ -153,6 +162,8 @@ def do_batch():
                 extraction_type, short_answer, long_answer = handle_directions(featured)
             elif featured_type == 'description':
                 extraction_type, short_answer, long_answer = handle_description(featured)
+            elif featured_type == 'overview':
+                extraction_type, short_answer, long_answer = handle_overview(doc)
             elif has_no_other_answer_markers(doc) and ( \
                 featured_type == 'web results' or
                 featured_type == 'people also ask' or
