@@ -1,4 +1,5 @@
 from flask import Flask, request, send_from_directory
+from html import escape
 import psycopg2
 import pytz
 import gcp
@@ -91,7 +92,9 @@ def show_html():
     if answer_type == 'rich_set' or answer_type == 'rich_list':
         list = ast.literal_eval(long)
         list_type = 'ul' if answer_type == 'rich_list' else 'ul'
-        long_str = '<{0}>{1}</{0}>'.format(list_type, ''.join(['<li>{0}</li>'.format(x) for x in list]))
+        long_str = '<{0}>{1}</{0}>'.format(
+                list_type,
+                ''.join(['<li>{0}</li>'.format(escape(x)) for x in list]))
     return '''
         <html>
             <head>
