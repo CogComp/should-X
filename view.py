@@ -76,14 +76,17 @@ def show_html():
     id = int(re.sub('[^0-9]', '', request.args.get('id')))
     cur.execute('''
         SELECT
-          question, html, short_answer, e.answer, answer_type
+          question, html, short_answer, e.answer, answer_type, answer_url
         FROM queries AS q
         LEFT JOIN extractions AS e ON q.id = e.id
         WHERE q.id = %s;''', [id])
-    question, html, short, long, answer_type = cur.fetchone()
+    question, html, short, long, answer_type, answer_url = cur.fetchone()
     short_str = '<strong>{0}</strong>'.format(short) if short else 'Unknown'
     long_str = long if long else 'Unknown'
     answer_type_str = answer_type if answer_type else 'Unknown'
+    answer_url_str = 'N/A'
+    if answer_url:
+        answer_url_str = '<a target="_blank" href="{0}">FOUND</a>'.format(answer_url)
     if answer_type:
         if not short:
             short_str = 'N/A'
@@ -108,11 +111,12 @@ def show_html():
                     <tr><td>Answer Type</td><td>{5}</td></tr>
                     <tr><td>Short answer</td><td>{3}</td></tr>
                     <tr><td>Long answer</td><td>{4}</td></tr>
+                    <tr><td>Answer URL: {6}</td></tr>
                 </table>
                 {1}
             </body>
         </html>
-    '''.format(question, html, search_form(id), short_str, long_str, answer_type_str)
+    '''.format(question, html, search_form(id), short_str, long_str, answer_type_str, answer_url_str)
 
 @app.route('/search')
 def show_search():
