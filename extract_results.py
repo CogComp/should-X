@@ -17,6 +17,10 @@ class Result:
         self.text = link.h3.text
         self.url = link['href']
 
+def remove_divs(doc, div_class):
+    for d in doc.find_all('div', attrs={'class': div_class}):
+        d.clear()
+
 def do_batch():
     cur.execute('''
         SELECT q.id, html
@@ -32,9 +36,9 @@ def do_batch():
         doc = BeautifulSoup(html, 'html.parser')
         results = []
 
-        try:
-            for blk in doc.find_all('div', attrs={'class': 'g-blk'}):
-                blk.clear() # includes suggested queries
+        try: 
+            remove_divs(doc, 'g-blk') # includes suggested queries
+            remove_divs(doc, 'kp-wholepage') # knowledge-graph stuff. e.g. 3923397
 
             for result in doc.find_all('div', attrs={'class': 'rc'}):
                 results.append(Result(len(results), result))

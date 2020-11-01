@@ -65,6 +65,7 @@ def handle_currency_converter(featured):
     return 'curr_conv', short_answer, None
 
 def handle_translation_result(featured):
+    # todo: 8349104 as an example of one with another result
     short_answer = featured.parent.find('pre', {'id': 'tw-target-text'}).get_text()
     return 'tr_result', short_answer, None
 
@@ -102,6 +103,7 @@ def handle_overview(doc):
     return 'overview', short_ans, None
 
 def handle_no_snippet(featured):
+    # todo: 1119248 and 8349104 as examples of incorrect no_answer extractions
     return 'no_answer', None, None
 
 def has_no_other_answer_markers(doc):
