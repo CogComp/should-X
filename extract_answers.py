@@ -3,7 +3,7 @@
 import gcp
 from bs4 import BeautifulSoup
 
-version = 10 # increment version to go through pages we are uncertain about again
+version = 12 # increment version to go through pages we are uncertain about again
 batch_size = 20
 
 conn, cur = gcp.connect_to_gcp()
@@ -108,12 +108,18 @@ def has_no_other_answer_markers(doc):
     return doc.find('div', {'class': 'kp-header'}) is None and \
             doc.find('div', {'class': 'answered-question'}) is None
 
+def get_url(snippet):
+    r_div = snippet.find('div', attrs={'class': 'r'})
+    if r_div:
+        return r_div.a['href']
+
 def do_batch():
     cur.execute('''
         SELECT q.id, question, html
         FROM queries AS q
           LEFT JOIN extractions AS e ON q.id = e.id
         WHERE q.html IS NOT NULL
+          AND q.id = 7669997
           AND e.answer IS NULL
           AND e.short_answer IS NULL
           AND e.answer_type IS NULL
@@ -126,6 +132,7 @@ def do_batch():
         extraction_type = None
         short_answer = None
         long_answer = None
+        url = None
 
         doc = BeautifulSoup(html, 'html.parser')
         featured = doc.h2
@@ -143,6 +150,7 @@ def do_batch():
         try:
             if featured_type == 'featured snippet from the web':
                 snippet = featured.parent.div
+                url = get_url(snippet)
                 extraction_type, short_answer, long_answer = handle_featured_snippet(snippet)
             elif featured_type == 'unit converter':
                 extraction_type, short_answer, long_answer = handle_unit_converter(featured, question)
@@ -173,6 +181,7 @@ def do_batch():
             else:
                 answered_div = doc.find('div', {'class': 'answered-question'})
                 if answered_div:
+                    url = get_url(snippet)
                     extraction_type, short_answer, long_answer = handle_featured_snippet(answered_div)
                 else:
                     kp_header = doc.find('div', {'class': 'kp-header'})
@@ -198,16 +207,17 @@ def do_batch():
             answer = None
             answer_type = None
         cur.execute('''
-            INSERT INTO extractions (id, short_answer, answer, answer_type, extract_v)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO extractions (id, short_answer, answer, answer_url, answer_type, extract_v)
+            VALUES (%s, %s, %s, %s, %s, %s)
             ON CONFLICT (id)
             DO UPDATE
               SET
                 short_answer = EXCLUDED.short_answer,
                 answer = EXCLUDED.answer,
+                answer_url = EXCLUDED.answer_url,
                 answer_type = EXCLUDED.answer_type,
                 extract_v = EXCLUDED.extract_v;
-        ''', [id, short_answer, long_answer, extraction_type, version])
+        ''', [id, short_answer, long_answer, url, extraction_type, version])
     conn.commit()
     print('Extracted from {0} pages'.format(batch_size))
 
