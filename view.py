@@ -98,6 +98,22 @@ def show_html():
         long_str = '<{0}>{1}</{0}>'.format(
                 list_type,
                 ''.join(['<li>{0}</li>'.format(escape(x)) for x in list]))
+    
+    results_html = ''
+    cur.execute('''
+        SELECT
+          text, url
+        FROM queries AS q
+        JOIN search_results AS r ON q.id = r.question_id
+        WHERE q.id = %s
+        ORDER BY r.position ASC;''', [id])
+    for text, url in cur.fetchall():
+        results_html += '<li><a target="_blank" href="{0}">{1}</a></li>'.format(url, text)
+    if results_html:
+        results_html = '<ol id="scraped-results">{0}</ol>'.format(results_html)
+    else:
+        results_html = 'Not extracted yet'
+
     return '''
         <html>
             <head>
@@ -113,10 +129,12 @@ def show_html():
                     <tr><td>Long answer</td><td>{4}</td></tr>
                     <tr><td>Answer URL: {6}</td></tr>
                 </table>
+                <p>Results: </p>{7}
                 {1}
             </body>
         </html>
-    '''.format(question, html, search_form(id), short_str, long_str, answer_type_str, answer_url_str)
+    '''.format(question, html, search_form(id), short_str, long_str, answer_type_str, answer_url_str,
+            results_html)
 
 @app.route('/search')
 def show_search():

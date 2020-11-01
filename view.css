@@ -5,6 +5,11 @@ h1#question {
 #search {
   margin: 0 25% 0 25%;
 }
+#scraped-results li {
+  list-style-type: decimal;
+  margin-left: 2em;
+  display: list-item;
+}
 [dir='ltr'],
 [dir='rtl'] {
  unicode-bidi:isolate;
