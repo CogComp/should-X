@@ -118,3 +118,8 @@ should-x.iml
 
 # vim
 *.swp
+*.swo
+*.swn
+
+# ignore the dump
+dump.json
